@@ -12,7 +12,7 @@ const ChatList = ({currChatId}) => {
     const [loading, setLoading] = useState(true);
     const [chats, setChats] = useState([]);
     const [search, setSearch] = useState('');
-
+    const [userStatus, setUserStatus] = useState({});
 
     const getContacts = async () => {
         try {
@@ -54,15 +54,44 @@ const ChatList = ({currChatId}) => {
                 setChats((allChats) => [...allChats, newChat]);
             }
 
+            const handleUserStatus = (data) => {
+                console.log("user data : ", data);
+                setUserStatus((prevUsers) => ({ 
+                    ...prevUsers,
+                    [data.userId] : data.status
+                }));
+            };
+
             // client pushers
             pusherClient.bind("last-message", chatPusherUpdate);
             // group chat
             pusherClient.bind("new-chat", handleGroupChaPusher);
+            // user status:
+            pusherClient.bind("user-status", handleUserStatus);
 
+            // Notify the server that user is online 
+            fetch(`/api/users/${currUser._id}/status`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify({
+                    userId: currUser._id,
+                    status: "online"
+                }),
+            })
             return () => {
+                // Notify server that user is offline 
+                fetch(`/api/users/${currUser._id}/status`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json', },
+                    body: JSON.stringify({
+                        userId: currUser._id,
+                        status: "offline"
+                    }),
+                })
                 pusherClient.unsubscribe(currUser._id);
                 pusherClient.unbind("last-message", chatPusherUpdate);
                 pusherClient.unbind("new-chat", handleGroupChaPusher);
+                pusherClient.unbind("user-status", handleUserStatus);
             }
         }
     }, [currUser])

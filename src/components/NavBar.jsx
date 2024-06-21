@@ -7,15 +7,22 @@ import React from 'react'
 
 const NavBar = () => {
     const pathName = usePathname();
-
-    const handleLogout = async () =>{
-        signOut({ callbackUrl: "/"});
-    };
-
     const {data : session} = useSession();
     // console.log("Session", session)
     const user = session?.user;
     // console.log("USer data : " ,user);
+
+    const handleLogout = async () =>{
+        // Notify server that user is offline
+        await fetch(`/api/users/${user._id}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user._id, status: 'offline' })
+        });
+        // by next Auth function
+        signOut({ callbackUrl: "/"});
+    };
+
     return (
         <div className='top-0 sticky px-10 py-5 flex items-center justify-between bg-blue-2 h-[12%]'>
             <Link href={"/"}>

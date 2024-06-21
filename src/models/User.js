@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
     chats:{
         type: [{type: mongoose.Types.ObjectId, ref: "Chat"}],
         default: [],
+    },
+    status:{
+        type: String,
+        default: "offline"
     }
 });
 

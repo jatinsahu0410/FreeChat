@@ -30,10 +30,10 @@ const ChatDataComponent = ({ chatId }) => {
       });
 
       const data = await res.json();
-      // console.log("Data : ", data);
+      console.log("Data : ", data);
       setChatData(data);
       setOtherMembers(data?.members?.filter(member => member._id !== currUser._id));
-      // console.log("other Members : ", otherMembers)
+      console.log("other Members : ", otherMembers)
       setLoading(false);
     } catch (error) {
       console.log("Error in getChatDetails", error)
@@ -170,6 +170,9 @@ const ChatDataComponent = ({ chatId }) => {
                 <div className='text'>
                   <p>
                     {otherMembers[0]?.userName}
+                  </p>
+                  <p>
+                    {otherMembers[0]?.status}
                   </p>
                 </div>
               </>
